@@ -4,7 +4,7 @@
 
 http://wiringpi.com/download-and-install/
 
-
+http://meinit.nl/allowing-a-group-to-execute-a-specific-command-without-using-a-password-using-sudo
 
 
 This repo provide the most complete Phalcon Framework stubs which enables autocompletion in modern IDEs.

@@ -31,7 +31,26 @@ class SprinklaController extends Controller
 //        $pin8 = $gpio->getOutputPin(9);
    //     $blah = $pin1->getNumber();
 
+        $status = array ( 0 );
+//set pins mode to output
 
+            system ( "gpio mode ".$i." out" );
+
+//turns on the LEDs
+
+            system ( "gpio write ".$i." 1" );
+
+//reads and prints the LEDs status
+        for ($i = 0; $i <= 7; $i++ ) {
+            exec ( "gpio read ".$i, $status );
+            echo ( $status[0] );
+        }
+//waits 2 seconds
+        sleep ( 2 );
+//turns off the LEDs
+        for ($i = 0; $i <= 7; $i++ ) {
+            system ( "gpio write ".$i." 0" );
+        }
         echo '<h1>fuckin sprinklers on biatch!</h1>';
       //  echo "<h1>$blah</h1>";
 

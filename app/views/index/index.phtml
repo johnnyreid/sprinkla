@@ -1,6 +1,6 @@
 <?php
 
-echo "<h1>Hello!</h1>";
+echo "<h1>Hello! -udpated</h1>";
 
 echo "<img src=../../../public/img/a-and-b-gpio-numbers_u9sxw0.png>";
 echo PHP_EOL;
@@ -10,23 +10,24 @@ echo PHP_EOL;
 
 $status = array ( 0 );
 //set pins mode to output
-for ($i = 0; $i <= 7; $i++ ) {
-    system ( "gpio mode ".$i." out" );
-}
-//turns on the LEDs
-for ($i = 0; $i <= 7; $i++ ) {
-    system ( "gpio write ".$i." 1" );
-}
-//reads and prints the LEDs status
-for ($i = 0; $i <= 7; $i++ ) {
-    exec ( "gpio read ".$i, $status );
-    echo ( $status[0] );
-}
-//waits 2 seconds
-sleep ( 2 );
-//turns off the LEDs
-for ($i = 0; $i <= 7; $i++ ) {
-    system ( "gpio write ".$i." 0" );
+
+system ( "sudo gpio mode 2 out" );
+
+for ($i = 0; $i <= 7; $i++ )
+{
+    //turns on the LEDs
+    system("sudo gpio write 2 1");
+
+    //reads and prints the LEDs statuse
+    exec("sudo gpio read 2", $status);
+    echo($status[0]);
+
+    //waits 2 seconds
+    sleep(1);
+
+    //turns off the LEDs
+    system("sudo gpio write 2 0");
+    sleep(1);
 }
 
 echo $this->tag->linkTo(
