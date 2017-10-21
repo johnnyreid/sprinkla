@@ -1,76 +1,68 @@
-<!DOCTYPE HTML>
-<html>
-<head>
-    <link rel="stylesheet" type="text/css" href="css/sliders.css">
-    <link rel="stylesheet" type="text/css" href="css/tables.css">
-
-    <style>
-        .error {color: #FF0000;}
-    </style>
-</head>
-<body>
-
-
 <?php
 
-$sprinkler1 = false;
-$sprinkler2 = false;
-$sprinkler3 = false;
-$sprinkler4 = false;
-$sprinkler5 = false;
-$sprinkler6 = false;
-$sprinkler7 = false;
+use Phalcon\Loader;
+use Phalcon\Mvc\View;
+use Phalcon\Mvc\Application;
+use Phalcon\Di\FactoryDefault;
+use Phalcon\Mvc\Url as UrlProvider;
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+use PiPHP\GPIO\GPIO;
+use PiPHP\GPIO\Pin\PinInterface;
+
+include '../app/vendor/autoload.php';
+
+// Define some absolute path constants to aid in locating resources
+define('BASE_PATH', dirname(__DIR__));
+define('APP_PATH', BASE_PATH . '/app');
+
+// Register an autoloader
+$loader = new Loader();
+
+$loader->registerDirs(
+    [
+        APP_PATH . '/controllers/',
+        APP_PATH . '/models/',
+    ]
+);
+
+$loader->register();
+
+// Create a DI
+$di = new FactoryDefault();
+
+// Setup the view component
+$di->set(
+    'view',
+    function () {
+        $view = new View();
+        $view->setViewsDir(APP_PATH . '/views/');
+        return $view;
+    }
+);
+
+// Setup a base URI so that all generated URIs include the "tutorial" folder
+$di->set(
+    'url',
+    function () {
+        $url = new UrlProvider();
+        $url->setBaseUri('/');
+        return $url;
+    }
+);
+
+$application = new Application($di);
+
+try {
 
 
-    empty($_POST["checkbox1"]) ? $sprinkler1="false" : $sprinkler1="true";
 
+
+
+
+    // Handle the request
+    $response = $application->handle();
+
+    $response->send();
+} catch (\Exception $e) {
+    echo 'Exception: ', $e->getMessage();
 }
-function gather_input($data)
-{
-    $data = trim($data);
-    $data = stripslashes($data);
-    $data = htmlspecialchars($data);
-    return $data;
-}
-?>
-
-<h2>Turn the sprinklers on or off</h2>
-<form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
-
-
-
-
-
-<form action="doSomething.php" method="POST" target="_self">
-
-<table style="width:50%" >
-    <tr>
-        <td>
-            <label class="switch"/>
-                <input type="checkbox" name="checkbox1" value="true" <?php if (isset($sprinkler1) && $sprinkler1=="true")echo "checked";?> onChange="this.form.submit()">
-                <span class="slider round"></span>
-            </label>
-        </td>
-        <td class="fuckyou">
-            <p >Area 1</p>
-        </td>
-    </tr>
-
-</table>
-
-</form>
-
-
-    <?php
-    echo "<h2>Your Input:</h2>";
-
-    echo "<br>";
-    echo $sprinkler1;
-    echo "<br>";
-    ?>
-
-
-</body>
-</html>

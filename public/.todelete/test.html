@@ -1,8 +1,8 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-    <link rel="stylesheet" type="text/css" href="css/sliders.css">
-    <link rel="stylesheet" type="text/css" href="css/tables.css">
+    <link rel="stylesheet" type="text/css" href="../css/sliders.css">
+    <link rel="stylesheet" type="text/css" href="../css/tables.css">
 
     <style>
         .error {color: #FF0000;}

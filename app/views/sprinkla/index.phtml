@@ -1,0 +1,40 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="../../../public/css/sliders.css">
+    <link rel="stylesheet" type="text/css" href="../../../public/css/tables.css">
+
+    <style>
+        .error {color: #FF0000;}
+    </style>
+</head>
+<body>
+
+<h2>Sign up using this form</h2>
+
+<?php echo $this->tag->form("sprinkla/register"); ?>
+<p>
+    <label class="switch"/>
+    <input type="checkbox" name="checkbox1" value="true" <?php if (isset($sprinkler1) && $sprinkler1=="true")echo "checked";?> onChange="this.form.submit()">
+    <span class="slider round"></span>
+    </label>
+</p>
+
+
+<p>
+    <label for="name">Name</label>
+    <?php echo $this->tag->textField("name"); ?>
+</p>
+
+<p>
+    <label for="email">E-Mail</label>
+    <?php echo $this->tag->textField("email"); ?>
+</p>
+
+<p>
+    <?php echo $this->tag->submitButton("Register"); ?>
+</p>
+
+</form>
+</body>
+</html>
