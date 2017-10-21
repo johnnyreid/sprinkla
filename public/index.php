@@ -53,12 +53,6 @@ $di->set(
 $application = new Application($di);
 
 try {
-
-
-
-
-
-
     // Handle the request
     $response = $application->handle();
 

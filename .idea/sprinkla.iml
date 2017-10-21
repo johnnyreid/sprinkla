@@ -7,10 +7,10 @@
     <orderEntry type="module-library">
       <library name="PHP" type="php">
         <CLASSES>
-          <root url="file://C:/Library/Phalcon/ide-stubs" />
+          <root url="file://$MODULE_DIR$/../ide-stubs-master" />
         </CLASSES>
         <SOURCES>
-          <root url="file://C:/Library/Phalcon/ide-stubs" />
+          <root url="file://$MODULE_DIR$/../ide-stubs-master" />
         </SOURCES>
       </library>
     </orderEntry>
