@@ -1,36 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" type="text/css" href="../../../public/css/sliders.css">
+    <link rel="stylesheet" type="text/css" href="../../../public/css/tables.css">
+    <link rel="stylesheet" type="text/css" href="../../../public/css/general.css">
+    <title>Raspberry Pi Gpio</title>
+</head>
+
+<body>
+<!-- javascript -->
+<script src="../../../public/scripts/script.js"></script>
+
+<label class='switch'>
+    <h3 id="help">Sprinkler 2: </h3>
+    <br><br>
+    <input type='checkbox' id='switch_2gay' onclick='blah()'>
+    <span class='slider round'></span>
+</label>
+<br><br>
+
+
+
+
+    <?php
+        //this php script generate the first page in function of the file
+        $values = array(0,0,0,0,0,0,0,0);
+
+        for ( $i= 0; $i<8; $i++)
+        {
+            //set the pin's mode to output
+            system("sudo gpio mode ".$i." out");
+
+
+            //testomg
+            //todo:remove this
+
+
+            exec ("sudo gpio write 2 1");
+
+
+            //read the current value of the pin and load into the array
+            exec ("sudo gpio read ".$i, $values[$i], $return );
+        }
+
+
+        //debugging
+        //Todo: remove
+        echo ("<H3> Debugging -------------------------------------- </H3>");
+        //for loop to read the value
+        for ($i = 0; $i < 8; $i++)
+        {
+            echo ("<h3>Value for GPIO Number ".$i.": ".$values[$i][0]."</h3>");
+        }
+        echo ("<H3> End of Debugging -------------------------------------- </H3>");
+        //end of debugging
+//echo ("<p id='demo'></p>");
+//    echo ("<label class='switch'>");
+//    echo ("<input type='checkbox' id='switch_2_debug' value='true' checked='checked'>");
+//    echo ("<span class='slider round'></span>");
+//    echo ("</label>");
+//    echo ("<br><br>");
+//
+
+//    echo ("<label class='switch'>");
+//    echo ("<h3>TEST: </h3>");
+//    echo ("<input type='checkbox' id='switch_22_debug' onchange='blah();'>");
+//    echo ("<span class='slider round'></span>");
+//    echo ("</label>");
+//    echo ("<br><br>");
+
+    echo ("<p id='demo'></p>");
+
+
+
+
+    $that = '';
+    if ($values[2][0] = 1)
+    {
+        $that='checked';
+    }
+
+
+    $i=0;
+       //for loop to read the value
+        for ($i = 0; $i < 8; $i++)
+        {
+         //if off
+
+            if ( $values[$i][0] == 0 )
+            {
+                echo ("<label class='switch'>");
+                echo ("<h3>Sprinkler ".$i.": </h3>");
+                echo ("<input type='checkbox' id='switch_".$i."' onclick='change_pin (".$i.");'>");
+                echo ("<span class='slider round'></span>");
+                echo ("</label>");
+                echo ("<br><br>");
+                //echo ("<img id='button_".$i."' src='data/img/red/red_".$i.".jpg' onclick='change_pin (".$i.");'/>");
+            }
+            //if on
+            if ( $values[$i][0] == 1 )
+            {
+
+                echo ("<label class='switch'>");
+                echo ("<h3>Sprinkler ".$i.": </h3>");
+                echo ("<input type='checkbox' id='switch_".$i."' checked onclick='change_pin (".$i.");'>");
+
+                echo ("<span class='slider round'></span>");
+                echo ("</label>");
+                echo ("<br><br>");
+                //echo ("<img id='button_".$i."' src='data/img/green/green_".$i.".jpg' onclick='change_pin (".$i.");'/>");
+            }
+        }
+
+
+
+    //<!-- javascript -->
+//included in head
+    ?>
+
+
+
+</body>
+</html>
+
+
+
+
 <?php
-
-echo "<h1>Hello! -udpated</h1>";
-
-echo "<img src=../../../public/img/a-and-b-gpio-numbers_u9sxw0.png>";
-echo PHP_EOL;
-
-echo PHP_EOL;
-
-
-$status = array ( 0 );
-//set pins mode to output
-
-system ( "sudo gpio mode 2 out" );
-
-for ($i = 0; $i <= 7; $i++ )
-{
-    //turns on the LEDs
-    system("sudo gpio write 2 1");
-
-    //reads and prints the LEDs statuse
-    exec("sudo gpio read 2", $status);
-    echo($status[0]);
-
-    //waits 2 seconds
-    sleep(1);
-
-    //turns off the LEDs
-    system("sudo gpio write 2 0");
-    sleep(1);
-}
-
-echo $this->tag->linkTo(
-    "sprinkla",
-    "Control the sprinklas"
-);
+//
+//echo "<h1>Hello! -udpated</h1>";
+//
+//echo "<img src=../public/img/a-and-b-gpio-numbers_u9sxw0.png>";
+//echo PHP_EOL;
+//
+//echo PHP_EOL;
+//
+//
+//$status = array ( 0 );
+////set pins mode to output
+//
+//system ( "sudo gpio mode 2 out" );
+//
+//for ($i = 0; $i <= 7; $i++ )
+//{
+//    //turns on the LEDs
+//    system("sudo gpio write 2 1");
+//
+//    //reads and prints the LEDs statuse
+//    exec("sudo gpio read 2", $status);
+//    echo($status[0]);
+//
+//    //waits 2 seconds
+//    sleep(1);
+//
+//    //turns off the LEDs
+//    system("sudo gpio write 2 0");
+//    sleep(1);
+//}
+//
+//echo $this->tag->linkTo(
+//    "sprinkla",
+//    "Control the sprinklas"
+//);
+?>
