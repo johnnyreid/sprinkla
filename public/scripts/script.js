@@ -16,50 +16,41 @@ var switches = [ switch_0, switch_1, switch_2, switch_3, switch_4, switch_5, swi
 
 function blah()
 {
-alert("u are so shit")
+    //this is the http request
+    var request = new XMLHttpRequest();
+    request.open( "GET" , "../../app/scripts/gpioToggle.php?switch=2", true);
+
+    //receiving informations
+    request.onreadystatechange = function (){
+        if ( request.readyState === 4 ){
+            document.getElementById("demo").innerHTML = request.responseText;
+
+        }else{
+            document.getElementById("demo").innerHTML = request.statusText;
+            alert(request.statusText);
+        }
+    };
+    request.send(null);
 }
 
 
 //This function is asking for gpio.php, receiving datas and updating the index.php pictures
 function change_pin ( gpioNumber)
 {
+    var data = 0;
 
-
+    //send the switch number to gpio.php for changes
 
     //this is the http request
     var request = new XMLHttpRequest();
-    var data = 0;
-
-    document.getElementById("demo").innerHTML ="gpioNumber: " + gpioNumber;
-    //send the switch number to gpio.php for changes
-    try{
-
-url = "/../../../app/scripts/gpio.php";
-var result = '';
-result.get(url)
-    .done(function() {
-        document.getElementById("demo").innerHTML ="script exists";
-    }).fail(function() {
-    document.getElementById("demo").innerHTML ="script does not exists";
-});
-
-    request.open( "GET" , "/../../../app/scripts/gpio.php?switch=" + gpioNumber, true);
-
-    }
-    catch(err) {
-        document.getElementById("demo").innerHTML = err.message;
-    }
-
+    request.open( "GET" , "/../../app/scripts/gpioToggle.php?switch=" + gpioNumber, true);
     request.send(null);
 
     //receiving informations
-    request.onreadystatechange = function ()
-    {
-        if (request.readyState === 4 && request.status === 200)
-        {
-
-
+    request.onreadystatechange = function () {
+        if (request.readyState === 4 && request.status === 200) {
             data = request.responseText;
+
             //update the index pic
             if (!(data.localeCompare("0"))) //false
             {
@@ -77,13 +68,17 @@ result.get(url)
             else
             {
                 alert("Something went wrong2!");
+                alert(data);
                 return ("fail");
             }
 
 
         }
-        else if(request.status==404)s+=" doesn't exist.";
-
+        else if (request.status === 404)
+        {
+            alert("doesn't exist.");
+            return ("fail");
+        }
         //test if fail
         else if (request.readyState === 4 && request.status === 500)
         {
