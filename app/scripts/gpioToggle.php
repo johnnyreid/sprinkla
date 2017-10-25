@@ -62,8 +62,11 @@ else
         //test if value is a number
         if ((is_numeric($gpioNumber)) && ($gpioNumber <= 7) && ($gpioNumber >= 0))
         {
-            ToggleGpio($gpioNumber);
-            echo ("pass");
+            $result = ToggleGpio($gpioNumber);
+
+            //Return the status of the gpio
+            echo $result;
+
         }
         else
         {

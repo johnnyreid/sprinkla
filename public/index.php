@@ -1,62 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" type="text/css" href="../public/css/sliders.css">
+    <link rel="stylesheet" type="text/css" href="../public/css/tables.css">
+    <link rel="stylesheet" type="text/css" href="../public/css/general.css">
+    <title>Raspberry Pi Gpio</title>
+</head>
+
+<body>
+<!-- javascript -->
+<script src="../public/scripts/script.js"></script>
+
 <?php
 
-use Phalcon\Loader;
-use Phalcon\Mvc\View;
-use Phalcon\Mvc\Application;
-use Phalcon\Di\FactoryDefault;
-use Phalcon\Mvc\Url as UrlProvider;
+    //system("whoami");
 
-use PiPHP\GPIO\GPIO;
-use PiPHP\GPIO\Pin\PinInterface;
+    //this php script generate the first page in function of the file
+    $values = array(0,0,0,0,0,0,0,0);
 
-include '../app/vendor/autoload.php';
+    for ( $i= 0; $i<8; $i++)
+    {
+        //set the pin's mode to output
+        system("sudo gpio mode ".$i." out");
 
-// Define some absolute path constants to aid in locating resources
-define('BASE_PATH', dirname(__DIR__));
-define('APP_PATH', BASE_PATH . '/app');
-
-// Register an autoloader
-$loader = new Loader();
-
-$loader->registerDirs(
-    [
-        APP_PATH . '/controllers/',
-        APP_PATH . '/models/',
-    ]
-);
-
-$loader->register();
-
-// Create a DI
-$di = new FactoryDefault();
-
-// Setup the view component
-$di->set(
-    'view',
-    function () {
-        $view = new View();
-        $view->setViewsDir(APP_PATH . '/views/');
-        return $view;
+        //read the current value of the pin and load into the array
+        exec ("sudo gpio read ".$i, $values[$i], $return );
     }
-);
 
-// Setup a base URI so that all generated URIs include the "tutorial" folder
-$di->set(
-    'url',
-    function () {
-        $url = new UrlProvider();
-        $url->setBaseUri('/');
-        return $url;
+    //for loop to read the value
+    for ($i = 0; $i < 8; $i++)
+    {
+        //if off
+        if ( $values[$i][0] == 0 )
+        {
+            echo ("<label class='switch'>");
+            echo ("<h3>Sprinkler ".$i.": </h3>");
+            echo ("<input type='checkbox' id='switch_".$i."' onclick='change_pin (".$i.");'>");
+            echo ("<span class='slider round'></span>");
+            echo ("</label>");
+            echo ("<br><br>");
+        //echo ("<img id='button_".$i."' src='data/img/red/red_".$i.".jpg' onclick='change_pin (".$i.");'/>");
+        }
+        //if on
+        if ( $values[$i][0] == 1 )
+        {
+            echo ("<label class='switch'>");
+            echo ("<h3>Sprinkler ".$i.": </h3>");
+            echo ("<input type='checkbox' id='switch_".$i."' checked onclick='change_pin (".$i.");'>");
+            echo ("<span class='slider round'></span>");
+            echo ("</label>");
+            echo ("<br><br>");
+        //echo ("<img id='button_".$i."' src='data/img/green/green_".$i.".jpg' onclick='change_pin (".$i.");'/>");
+        }
     }
-);
+?>
 
-$application = new Application($di);
 
-try {
-    // Handle the request
-    $response = $application->handle();
 
-    $response->send();
-} catch (\Exception $e) {
-    echo 'Exception: ', $e->getMessage();
-}
+
+</body>
+</html>
+
+
+

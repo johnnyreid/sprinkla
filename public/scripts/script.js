@@ -9,7 +9,6 @@ var switch_5 = document.getElementById("switch_5");
 var switch_6 = document.getElementById("switch_6");
 var switch_7 = document.getElementById("switch_7");
 
-var switch_2gay = document.getElementById("switch_2gay");
 
 //Create an array for easy access later
 var switches = [ switch_0, switch_1, switch_2, switch_3, switch_4, switch_5, switch_6, switch_7];
@@ -43,7 +42,7 @@ function change_pin ( gpioNumber)
 
     //this is the http request
     var request = new XMLHttpRequest();
-    request.open( "GET" , "/../../app/scripts/gpioToggle.php?switch=" + gpioNumber, true);
+    request.open( "GET" , "../app/scripts/gpioToggle.php?switch=" + gpioNumber, true);
     request.send(null);
 
     //receiving informations
@@ -52,15 +51,20 @@ function change_pin ( gpioNumber)
             data = request.responseText;
 
             //update the index pic
-            if (!(data.localeCompare("0"))) //false
+            if ((data.localeCompare("0"))) //false
             {
+                //todo: remove the line below
+                alert("Switched on. Data: " + data);
                 switches[gpioNumber].removeAttribute("checked");
             }
-            else if (!(data.localeCompare("1"))) //true
+            else if ((data.localeCompare("1"))) //true
             {
+                //todo: remove the line below
+                alert("Switched off. Data: " + data);
+
                 switches[gpioNumber].setAttribute("checked", "checked");
             }
-            else if (!(data.localeCompare("fail")))
+            else if ((data.localeCompare("fail")))
             {
                 alert("Something went wrong1!");
                 return ("fail");
@@ -68,7 +72,6 @@ function change_pin ( gpioNumber)
             else
             {
                 alert("Something went wrong2!");
-                alert(data);
                 return ("fail");
             }
 
@@ -88,7 +91,9 @@ function change_pin ( gpioNumber)
         //else
         else if (request.readyState === 4 && request.status !== 200 && request.status !== 500)
         {
+            alert(request.status)
             alert("Something went wrong3!");
+
             return ("fail");
         }
     };
