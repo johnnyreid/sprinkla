@@ -52,6 +52,30 @@ This repo provide the most complete Phalcon Framework stubs which enables autoco
 
 2. Setup your IDE.
 
+
+## Raspberri Pi Setup Notes
+
+### Disable edimax wifi adapter power management
+
+Prevent Edimax wifi adapter reduced power mode:
+
+From: https://www.raspberrypi.org/forums/viewtopic.php?t=61665
+
+Make a file 8192cu.conf in directory /etc/modprobe.d/ with the command
+Code: Select all
+
+sudo nano /etc/modprobe.d/8192cu.conf
+and add the following lines
+Code: Select all
+
+
+options 8192cu rtw_power_mgnt=0 rtw_enusbss=0
+I'm assuming you are using the Edimax EW-7811Un
+
+
+
+
+
 ## License
 
 Phalcon IDE Stubs is open-sourced software licensed under the New BSD License. © Phalcon Framework Team and contributors.
