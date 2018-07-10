@@ -60,7 +60,7 @@ else
         $gpioNumber = strip_tags($_GET["switch"]);
 
         //test if value is a number
-        if ((is_numeric($gpioNumber)) && ($gpioNumber <= 7) && ($gpioNumber >= 0))
+        if (is_numeric($gpioNumber))
         {
             $result = ToggleGpio($gpioNumber);
 

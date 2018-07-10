@@ -8,10 +8,11 @@ var switch_4 = document.getElementById("switch_4");
 var switch_5 = document.getElementById("switch_5");
 var switch_6 = document.getElementById("switch_6");
 var switch_7 = document.getElementById("switch_7");
-
+var switch_21 = document.getElementById("switch_21");
+var switch_22 = document.getElementById("switch_22");
 
 //Create an array for easy access later
-var switches = [ switch_0, switch_1, switch_2, switch_3, switch_4, switch_5, switch_6, switch_7];
+var switches = [ switch_0, switch_1, switch_2, switch_3, switch_4, switch_5, switch_6, switch_7, switch_21, switch_22];
 
 function blah()
 {
@@ -54,13 +55,13 @@ function change_pin ( gpioNumber)
             if ((data.localeCompare("0"))) //false
             {
                 //todo: remove the line below
-                alert("Switched on. Data: " + data);
+                //alert("Switched on. Data: " + data);
                 switches[gpioNumber].removeAttribute("checked");
             }
             else if ((data.localeCompare("1"))) //true
             {
                 //todo: remove the line below
-                alert("Switched off. Data: " + data);
+                //alert("Switched off. Data: " + data);
 
                 switches[gpioNumber].setAttribute("checked", "checked");
             }
