@@ -80,3 +80,19 @@ else
 }
 
 
+function pleaseTurnOffInAFewMinutes(int $gpioNumber)
+{
+
+    system("sudo gpio write " . $gpioNumber . " 1");
+
+    //wait a sec
+    sleep(30);
+
+    system("sudo gpio write " . $gpioNumber . " 0");
+
+    //reading pin's status
+    exec("sudo gpio read " . $gpioNumber, $status, $return);
+
+    //return the status of the GPIO
+    return ($status[0]);
+}

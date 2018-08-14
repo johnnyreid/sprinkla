@@ -14,24 +14,6 @@ var switch_22 = document.getElementById("switch_22");
 //Create an array for easy access later
 var switches = [ switch_0, switch_1, switch_2, switch_3, switch_4, switch_5, switch_6, switch_7, switch_21, switch_22];
 
-function blah()
-{
-    //this is the http request
-    var request = new XMLHttpRequest();
-    request.open( "GET" , "../../app/scripts/gpioToggle.php?switch=2", true);
-
-    //receiving informations
-    request.onreadystatechange = function (){
-        if ( request.readyState === 4 ){
-            document.getElementById("demo").innerHTML = request.responseText;
-
-        }else{
-            document.getElementById("demo").innerHTML = request.statusText;
-            alert(request.statusText);
-        }
-    };
-    request.send(null);
-}
 
 
 //This function is asking for gpio.php, receiving datas and updating the index.php pictures
@@ -64,6 +46,15 @@ function change_pin ( gpioNumber)
                 //alert("Switched off. Data: " + data);
 
                 switches[gpioNumber].setAttribute("checked", "checked");
+
+                // //this is the http request
+                // var request2 = new XMLHttpRequest();
+                // request2.open( "GET" , "../app/scripts/pleaseTurnOffInAFewMinutes.php?switch=" + gpioNumber, true);
+                // request2.send(null);
+
+
+
+
             }
             else if ((data.localeCompare("fail")))
             {
@@ -80,13 +71,13 @@ function change_pin ( gpioNumber)
         }
         else if (request.status === 404)
         {
-            alert("doesn't exist.");
+            alert("Request Response 404: doesn't exist.");
             return ("fail");
         }
         //test if fail
         else if (request.readyState === 4 && request.status === 500)
         {
-            alert("server error");
+            alert("Request Response 500: Internal server error");
             return ("fail");
         }
         //else
@@ -101,3 +92,22 @@ function change_pin ( gpioNumber)
 
     return 0;
 }
+
+// function blah()
+// {
+//     //this is the http request
+//     var request = new XMLHttpRequest();
+//     request.open( "GET" , "../../app/scripts/gpioToggle.php?switch=2", true);
+//
+//     //receiving informations
+//     request.onreadystatechange = function (){
+//         if ( request.readyState === 4 ){
+//             document.getElementById("demo").innerHTML = request.responseText;
+//
+//         }else{
+//             document.getElementById("demo").innerHTML = request.statusText;
+//             alert(request.statusText);
+//         }
+//     };
+//     request.send(null);
+// }

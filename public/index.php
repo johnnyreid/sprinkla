@@ -20,20 +20,7 @@
 		</noscript>
 	</head>
 	<body class="landing">
-
-		<!-- Header -->
-			<header id="header">
-				<h1><a href="index.php">Sprinkla</a></h1>
-				<nav id="nav">
-					<ul>
-						<li><a href="index.php">Home</a></li>
-						<li><a href="generic.html">Yard Map</a></li>
-						<li><a href="generic.html">Scheduler</a></li>
-						<li><a href="#" class="button special">Sign In</a></li>
-					</ul>
-				</nav>
-			</header>
-
+   <?php include "header.html" ?>
 		<!-- Banner -->
 			<section id="banner">
 				<header class="major">
@@ -61,10 +48,10 @@
 //                                    echo ("<h3>i = $i</h3>");
 //                                    echo ("<h3>val = $gpioPins[$i]</h3>");
                                     //set the pin's mode to output
-                                    system("sudo gpio mode ".$gpioPins[$i]." out");
+//                                    system("sudo gpio mode ".$gpioPins[$i]." out");
 
                                     //read the current value of the pin and load into the array
-                                    exec ("sudo gpio read ".$gpioPins[$i],$values[$i], $return );
+//                                    exec ("sudo gpio read ".$gpioPins[$i],$values[$i], $return );
 
 //                                    echo ("<h3>Sprinkler $gpioPins[$i], current value: $values[$i][0]</h3>");
                                     //if offs
@@ -146,37 +133,7 @@
 		    </section>
 
 
-		<!-- Footer -->
-			<footer id="footer">
-				<div class="container">
-
-					<div class="row">
-						<div class="8u 12u$(medium)">
-							<ul class="copyright">
-								<li>&copy; Johnny Reid. All rights reserved.</li>
-								<li>Design: <a href="https://github.com/johnnyreid">Johnny Reid</a></li>
-								<li>Images: <a href="http://www.google.com">google</a></li>
-							</ul>
-						</div>
-						<div class="4u$ 12u$(medium)">
-							<ul class="icons">
-								<li>
-									<a class="icon rounded fa-facebook"><span class="label">Facebook</span></a>
-								</li>
-								<li>
-									<a class="icon rounded fa-twitter"><span class="label">Twitter</span></a>
-								</li>
-								<li>
-									<a class="icon rounded fa-google-plus"><span class="label">Google+</span></a>
-								</li>
-								<li>
-									<a class="icon rounded fa-linkedin"><span class="label">LinkedIn</span></a>
-								</li>
-							</ul>
-						</div>
-					</div>
-				</div>
-			</footer>
+<?php include  "footer.html"?>
 
 	</body>
 </html>

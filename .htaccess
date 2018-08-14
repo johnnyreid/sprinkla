@@ -1,3 +1,7 @@
-# test/.htaccess
+# sprinkla/.htaccess
 
-DirectoryIndex index.html
+#redirect to public directory
+RedirectMatch ^/$ /public/
+
+#load default document
+DirectoryIndex index.php
