@@ -1,28 +1,37 @@
 <?php
 
+use Volantus\Pigpio\Client;
+use Volantus\Pigpio\Network\Socket;
+use Volantus\Pigpio\Protocol\Commands;
+use Volantus\Pigpio\Protocol\DefaultRequest;
 
 function ToggleGpio(int $gpioNumber)
 {
+    $client = new Client(new Socket('dumber.home.arpa', 8888));
+
     //set the gpio's mode to output
-    system("sudo gpio mode " . $gpioNumber . " out");
+//    system("sudo gpio mode " . $gpioNumber . " out");
     //reading pin's status
-    exec("sudo gpio read " . $gpioNumber, $status, $return);
+//    exec("sudo gpio read " . $gpioNumber, $status, $return);
+    //read the current value of the pin and load into the array
+    $status = $client->sendRaw(new DefaultRequest(Commands::READ, $gpioNumber, 0))->getResponse();
 
     //set the gpio to high/low
-    if ($status[0] == "0")
+    if ($status == "0")
     {
-        $status[0] = "1";
+        $status = "1";
     }
-    elseif( $status[0] == "1" )
+    elseif( $status == "1" )
     {
-        $status[0] = "0";
+        $status = "0";
     }
+    $status = $client->sendRaw(new DefaultRequest(Commands::WRITE, $gpioNumber, $status))->getResponse();
 
-    system("sudo gpio write " . $gpioNumber . " " . $status[0]);
+//    system("sudo gpio write " . $gpioNumber . " " . $status[0]);
     //reading pin's status
-    exec("sudo gpio read " . $gpioNumber, $status, $return);
+//    exec("sudo gpio read " . $gpioNumber, $status, $return);
     //return the status of the GPIO
-    return ($status[0]);
+    return ($status);
 }
 
 if (PHP_SAPI === 'cli')

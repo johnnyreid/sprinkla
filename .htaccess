@@ -1,7 +1,0 @@
-# sprinkla/.htaccess
-
-#redirect to public directory
-RedirectMatch ^/$ /public/
-
-#load default document
-DirectoryIndex index.php

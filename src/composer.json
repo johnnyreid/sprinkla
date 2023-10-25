@@ -1,0 +1,13 @@
+{
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/johnnyreid/php-pigpio.git",
+            "no-api" : true
+        }
+    ],
+    "require": {
+        "php" : ">=8.1",
+        "volantus/php-pigpio" : "8.0.0.*"
+    }
+}
