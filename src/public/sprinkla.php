@@ -77,18 +77,17 @@ require_once __DIR__ . '/../../config/config.php';
                     <h3>Lawn Sprinklers</h3>
                     <table>
 <?php
-//                    for ( $i= 0; $i<count($config["gpio"]); $i++)
-                    for ( $i= 0; $i<count($config["gpio"]["lawn"]); $i++)
+                    for ( $i= 0; $i<5; $i++)
                     {
                         echo    '<tr>',
-                                '<td style="vertical-align: middle; text-align: left">'.$config["gpio"]["lawn"][$i]["name"].':</td>',
-                                '<td style="vertical-align:middle"><label class="switch"><input type="checkbox" id="switch_'.$i.'" onclick="toggleSwitch('.$i.','.$config["gpio"]["lawn"][$i]["broadcom_number"].')">',
+                                '<td style="vertical-align: middle; text-align: left">'.$config["gpio"][$i]["name"].':</td>',
+                                '<td style="vertical-align:middle; width: 80px"><label class="switch"><input type="checkbox" id="switch_'.$i.'" onclick="toggleSwitch('.$i.','.$config["gpio"][$i]["broadcom_number"].')">',
                                 '<span class="slider round"></span>',
                                 '</label></td>',
                                 '</tr>',
                                 #run a script to set the initial checked status
                                 '<script type="text/javascript">',
-                                'setSwitch('.$i.','.$config["gpio"]["lawn"][$i]["broadcom_number"].');',
+                                'setSwitch('.$i.','.$config["gpio"][$i]["broadcom_number"].');',
                                 '</script>'
                                 ;
                     }
@@ -96,23 +95,23 @@ require_once __DIR__ . '/../../config/config.php';
                     </table>
                 </section>
             </div>
-            <div class="6u$ 16u$(medium) 12u$(xsmall)">
+            <div class="6u 16u$(medium) 12u$(xsmall)">
                 <section class="box">
                     <h3>Garden Beds</h3>
                     <table>
 
                         <?php
-                        for ( $i= 0; $i<count($config["gpio"]["garden"]); $i++)
+                        for ( $i=5; $i<count($config["gpio"]); $i++)
                         {
                             echo    '<tr>',
-                                '<td style="vertical-align:middle; text-align: left">'.$config["gpio"]["garden"][$i]["name"].':</td>',
-                                '<td style="vertical-align:middle"><label class="switch"><input type="checkbox" id="switch_' . $i . '" onclick="toggleSwitch('.$i.','.$config["gpio"]["garden"][$i]["broadcom_number"].')">',
+                                '<td style="vertical-align:middle; text-align: left;">'.$config["gpio"][$i]["name"].':</td>',
+                                '<td style="vertical-align:middle; width: 80px"><label class="switch"><input type="checkbox" id="switch_' . $i . '" onclick="toggleSwitch('.$i.','.$config["gpio"][$i]["broadcom_number"].')">',
                             '<span class="slider round"></span>',
                             '</label></td>',
                             '</tr>',
                                 #run a script to set the initial checked status
                             '<script type="text/javascript">',
-                                '   setSwitch('.$i.','.$config["gpio"]["garden"][$i]["broadcom_number"].');',
+                                '   setSwitch('.$i.','.$config["gpio"][$i]["broadcom_number"].');',
                             '</script>'
                             ;
                         }
