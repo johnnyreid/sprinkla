@@ -28,8 +28,12 @@
 //# 1 = relay off
 //########################
 
-$gpioPins               = array(17,18,27,22,23,24,25,4,5,6);
-$values                 = array(0,0,0,0,0,0,0,0,0,0);
+require_once __DIR__ . '/../../config/config.php';
+/** @var array $config */
+
+
+
+//$gpioPins               = array(17,18,27,22,23,24,25,4,5,6);
 ?>
 
 <!DOCTYPE html>
@@ -70,20 +74,21 @@ $values                 = array(0,0,0,0,0,0,0,0,0,0);
         <div class="row 150%">
             <div class="6u 16u$(medium) 12u$(xsmall)">
                 <section class="box">
-                    <h3>Lawns</h3>
+                    <h3>Lawn Sprinklers</h3>
                     <table>
 <?php
-                    for ( $i= 0; $i<6; $i++)
+//                    for ( $i= 0; $i<count($config["gpio"]); $i++)
+                    for ( $i= 0; $i<count($config["gpio"]["lawn"]); $i++)
                     {
                         echo    '<tr>',
-                                '<td style="vertical-align:middle">Sprinkler ' . $i+1 . ':</td>',
-                                '<td style="vertical-align:middle"><label class="switch"><input type="checkbox" id="switch_'.$i.'" onclick="toggleSwitch('.$i.','.$gpioPins[$i].')">',
+                                '<td style="vertical-align: middle; text-align: left">'.$config["gpio"]["lawn"][$i]["name"].':</td>',
+                                '<td style="vertical-align:middle"><label class="switch"><input type="checkbox" id="switch_'.$i.'" onclick="toggleSwitch('.$i.','.$config["gpio"]["lawn"][$i]["broadcom_number"].')">',
                                 '<span class="slider round"></span>',
                                 '</label></td>',
                                 '</tr>',
                                 #run a script to set the initial checked status
                                 '<script type="text/javascript">',
-                                'setSwitch('.$i.','.$gpioPins[$i].');',
+                                'setSwitch('.$i.','.$config["gpio"]["lawn"][$i]["broadcom_number"].');',
                                 '</script>'
                                 ;
                     }
@@ -93,25 +98,25 @@ $values                 = array(0,0,0,0,0,0,0,0,0,0);
             </div>
             <div class="6u$ 16u$(medium) 12u$(xsmall)">
                 <section class="box">
-                    <h3>Garden beds</h3>
+                    <h3>Garden Beds</h3>
                     <table>
 
-<?php
-                    for ( $i= 6; $i<count($gpioPins); $i++)
-                    {
-                        echo    '<tr>',
-                                '<td style="vertical-align:middle">Sprinkler ' . $i+1 . ':</td>',
-                                '<td style="vertical-align:middle"><label class="switch"><input type="checkbox" id="switch_' . $i . '" onclick="toggleSwitch('.$i.','.$gpioPins[$i].')">',
-                                '<span class="slider round"></span>',
-                                '</label></td>',
-                                '</tr>',
+                        <?php
+                        for ( $i= 0; $i<count($config["gpio"]["garden"]); $i++)
+                        {
+                            echo    '<tr>',
+                                '<td style="vertical-align:middle; text-align: left">'.$config["gpio"]["garden"][$i]["name"].':</td>',
+                                '<td style="vertical-align:middle"><label class="switch"><input type="checkbox" id="switch_' . $i . '" onclick="toggleSwitch('.$i.','.$config["gpio"]["garden"][$i]["broadcom_number"].')">',
+                            '<span class="slider round"></span>',
+                            '</label></td>',
+                            '</tr>',
                                 #run a script to set the initial checked status
-                                '<script type="text/javascript">',
-                                '   setSwitch(' . $i . ',' . $gpioPins[$i] . ');',
-                                '</script>'
-                        ;
-                    }
-?>
+                            '<script type="text/javascript">',
+                                '   setSwitch('.$i.','.$config["gpio"]["garden"][$i]["broadcom_number"].');',
+                            '</script>'
+                            ;
+                        }
+                        ?>
                     </table>
                 </section>
             </div>

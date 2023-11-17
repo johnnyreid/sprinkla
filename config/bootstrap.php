@@ -12,3 +12,4 @@ mb_http_output('UTF-8');
 setlocale(LC_ALL, 'en_AU.UTF-8');
 
 date_default_timezone_set('Australia/Brisbane');
+
