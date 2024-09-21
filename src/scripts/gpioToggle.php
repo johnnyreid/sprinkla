@@ -7,7 +7,7 @@ use Volantus\Pigpio\Protocol\DefaultRequest;
 
 function ToggleGpio(int $gpioNumber)
 {
-    $client = new Client(new Socket('dumber.home.arpa', 8888));
+    $client = new Client(new Socket('dumber', 8888));
 
     //set the gpio's mode to output
 //    system("sudo gpio mode " . $gpioNumber . " out");
