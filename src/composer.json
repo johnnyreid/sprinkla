@@ -7,7 +7,7 @@
         }
     ],
     "require": {
-        "php" : ">=8.1",
+        "php" : ">=8.2",
         "volantus/php-pigpio" : "8.0.0.*"
     }
 }

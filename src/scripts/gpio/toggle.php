@@ -6,7 +6,7 @@ use Volantus\Pigpio\Protocol\Commands;
 use Volantus\Pigpio\Protocol\DefaultRequest;
 
 
-$client                 = new Client(new Socket('dumber', 8888));
+$client                 = new Client(new Socket('192.168.20.9', 8888));
 
 // TODO Add assertions etc. about this value, passed by route
 /** @var string $broadcomNumber */
