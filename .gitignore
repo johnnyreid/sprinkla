@@ -1,6 +1,6 @@
 data/*
 .env
-/src/vendor/
+/vendor/
 .DS_Store
 
 
@@ -25,6 +25,6 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
-/src/composer.lock
+/composer.lock
 /composer.phar
 /xdebug.ini

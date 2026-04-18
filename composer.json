@@ -1,0 +1,20 @@
+{
+    "name": "johnnyreid/sprinkla",
+    "description": "Web interface for controlling garden sprinklers via a Raspberry Pi pigpio daemon",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.2",
+        "volantus/php-pigpio": "8.0.0.*"
+    },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/johnnyreid/php-pigpio.git",
+            "no-api": true
+        }
+    ],
+    "config": {
+        "vendor-dir": "vendor"
+    }
+}

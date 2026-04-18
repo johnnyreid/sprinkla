@@ -63,10 +63,12 @@ sprinkla/
 │   │   │   └── toggle.php     # GET /gpio/toggle/$pin — toggles GPIO and returns new state
 │   │   └── gpioToggle.php     # Legacy standalone toggle script (CLI + HTTP)
 │   │
-│   ├── composer.json          # PHP dependencies (volantus/php-pigpio)
-│   └── vendor/                # Composer dependencies (git-ignored)
+│   └── routes.php             # Route definitions (/, /gpio/read/$pin, /gpio/toggle/$pin)
 │
+├── composer.json              # PHP dependencies and project metadata
+├── composer.lock              # Locked dependency versions (git-ignored)
 ├── composer.phar              # Composer binary
+├── vendor/                    # Composer dependencies (git-ignored)
 ├── web.config                 # IIS config (placeholder)
 ├── xdebug.ini                 # Xdebug debug config
 └── models/                    # (empty — reserved for future use)
@@ -145,8 +147,7 @@ To add or remove sprinklers, edit the `$config["gpio"]` array. The UI splits at 
 
 2. Install PHP dependencies:
    ```bash
-   cd src
-   php ../composer.phar install
+   php composer.phar install
    ```
 
 3. Configure the Pi connection in `config/config.php` — set `pigpio_host` to your Raspberry Pi's IP address.
