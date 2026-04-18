@@ -429,9 +429,12 @@
     /* The switch - the box around the slider */
     .switch {
         position: relative;
-        display: table-cell;
+        display: inline-block;
         width: 60px;
         height: 34px;
+        vertical-align: middle;
+        font-size: 0;
+        line-height: 0;
     }
 
     /* Hide default HTML checkbox */
@@ -484,6 +487,28 @@
 
     .slider.round:before {
         border-radius: 50%;
+    }
+
+    /* Sprinkler table alignment */
+    .sprinkler-table td {
+        vertical-align: middle;
+        padding: 0.5em 0.5em;
+    }
+
+    .sprinkler-table .timer-adj-btn {
+        vertical-align: middle;
+    }
+
+    .sprinkler-table .timer-countdown {
+        vertical-align: middle;
+    }
+
+    .sprinkler-table .timer-clear-btn {
+        vertical-align: middle;
+    }
+
+    .sprinkler-table .timer-toggle-label {
+        vertical-align: middle;
     }
 
 

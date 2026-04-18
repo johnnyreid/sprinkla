@@ -2,6 +2,14 @@
 
 require_once '../../config/bootstrap.php';
 
+$clientIp = $_SERVER['REMOTE_ADDR'] ?? '-';
+$method = $_SERVER['REQUEST_METHOD'] ?? '-';
+$uri = $_SERVER['REQUEST_URI'] ?? '-';
+$userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '-';
+$referer = $_SERVER['HTTP_REFERER'] ?? '-';
+$statusCode = http_response_code() ?: 200;
+sprinkla_log_access("$clientIp \"$method $uri\" $statusCode \"$referer\" \"$userAgent\"");
+
 if ( ! isValidRequest($_SERVER['REQUEST_URI']) )
 {
     return false;

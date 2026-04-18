@@ -12,3 +12,9 @@ get('/scripts', 'scripts/test.php');
 get('/gpio/read/$broadcomNumber', 'scripts/gpio/read');
 
 get('/gpio/toggle/$broadcomNumber', 'scripts/gpio/toggle');
+
+get('/gpio/off/$broadcomNumber', 'scripts/gpio/off');
+
+get('/timer/load', 'scripts/timer/load');
+
+post('/timer/save', 'scripts/timer/save');

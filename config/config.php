@@ -9,6 +9,14 @@ $config["timer_default"]                                            = 15;
 $config["timer_step"]                                               = 5;
 $config["timer_min"]                                                = 5;
 
+$config["data_dir"]                                                 = __DIR__ . '/../data';
+
+$config["max_run_minutes"]                                          = 60;
+
+$config["log_dir"]                                                  = '/var/log/sprinkla';
+
+$config["alert_email"]                                              = '';  // Email address for safety timeout alerts (leave empty to disable)
+
 //Original configuration: array(17,18,27,22,23,24,25,4,5,6);
 //**************** Lawns ******************
 $config["gpio"][0]["broadcom_number"]                       = 17;

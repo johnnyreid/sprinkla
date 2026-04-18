@@ -43,21 +43,21 @@ function renderTimerControls(int $index, int $broadcomNumber, int $timerDefault)
     $html = '';
 
     // Timer enable toggle
-    $html .= '<td style="vertical-align:middle; text-align:center; width:50px">';
+    $html .= '<td style="text-align:center; width:50px">';
     $html .= '<label class="timer-toggle-label" title="Enable auto-off timer">';
     $html .= '<input type="checkbox" id="timer_toggle_' . $index . '" ';
     $html .= 'onchange="onTimerToggleChange(' . $index . ',' . $broadcomNumber . ')">';
-    $html .= ' ⏱</label></td>';
+    $html .= '<span class="timer-icon">⏱</span></label></td>';
 
     // Duration adjuster: -5 / display / +5
-    $html .= '<td style="vertical-align:middle; white-space:nowrap; text-align:center">';
+    $html .= '<td style="white-space:nowrap; text-align:center">';
     $html .= '<button class="timer-adj-btn" onclick="adjustDuration(' . $index . ',' . $broadcomNumber . ',-1)">−5</button> ';
     $html .= '<span id="timer_duration_display_' . $index . '" class="timer-duration-display">' . $timerDefault . 'm</span> ';
     $html .= '<button class="timer-adj-btn" onclick="adjustDuration(' . $index . ',' . $broadcomNumber . ',1)">+5</button>';
     $html .= '</td>';
 
     // Countdown display and clear button
-    $html .= '<td style="vertical-align:middle; width:100px; text-align:center; white-space:nowrap">';
+    $html .= '<td style="min-width:120px; width:120px; text-align:center; white-space:nowrap">';
     $html .= '<span id="timer_display_' . $index . '" class="timer-countdown" style="display:none"></span> ';
     $html .= '<button id="timer_clear_' . $index . '" class="timer-clear-btn" style="display:none" ';
     $html .= 'onclick="onTimerClear(' . $index . ')" title="Clear timer">✕</button>';
@@ -87,7 +87,9 @@ function renderTimerControls(int $index, int $broadcomNumber, int $timerDefault)
         <link rel="stylesheet" href="css/style-xlarge.css" />
     </noscript>
     <style>
-        .timer-toggle-label { cursor: pointer; font-size: 1.1em; }
+        .timer-toggle-label { cursor: pointer; display: inline-block; vertical-align: middle; }
+        .timer-toggle-label input { display: none; }
+        .timer-icon { font-size: 1.3em; display: inline-block; vertical-align: middle; position: relative; top: 8px; }
         .timer-adj-btn {
             background: #f0f0f0;
             border: 1px solid #ccc;
@@ -138,6 +140,13 @@ function renderTimerControls(int $index, int $broadcomNumber, int $timerDefault)
 <body class="landing">
 
 <div id="sprinkla-config" data-timer-default="<?php echo $timerDefault; ?>" data-timer-step="<?php echo $timerStep; ?>" data-timer-min="<?php echo $timerMin; ?>" style="display:none"></div>
+<script type="text/javascript">
+var sprinklerNames = {
+<?php foreach ($config["gpio"] as $i => $gpio): ?>
+    <?php echo $i; ?>: <?php echo json_encode($gpio["name"]); ?>,
+<?php endforeach; ?>
+};
+</script>
 
 <?php include "header.html" ?>
 
@@ -154,17 +163,17 @@ function renderTimerControls(int $index, int $broadcomNumber, int $timerDefault)
             <p>Control sprinklers below:</p>
         </header>
         <div class="row 150%">
-            <div class="6u 16u$(medium) 12u$(xsmall)">
+            <div class="6u 12u$(medium)">
                 <section class="box">
                     <h3>Lawn Sprinklers</h3>
-                    <table>
+                    <table class="sprinkler-table">
 <?php
                     for ($i = 0; $i < 5; $i++)
                     {
                         $bcn = $config["gpio"][$i]["broadcom_number"];
                         echo '<tr>',
-                            '<td style="vertical-align: middle; text-align: left">' . $config["gpio"][$i]["name"] . ':</td>',
-                            '<td style="vertical-align:middle; width: 80px"><label class="switch"><input type="checkbox" id="switch_' . $i . '" onclick="toggleSwitch(' . $i . ',' . $bcn . ')">',
+                            '<td style="text-align:left; white-space:nowrap">' . $config["gpio"][$i]["name"] . ':</td>',
+                            '<td style="min-width:80px; width:80px"><label class="switch"><input type="checkbox" id="switch_' . $i . '" onclick="toggleSwitch(' . $i . ',' . $bcn . ')">',
                             '<span class="slider round"></span>',
                             '</label></td>',
                             renderTimerControls($i, $bcn, $timerDefault),
@@ -177,17 +186,17 @@ function renderTimerControls(int $index, int $broadcomNumber, int $timerDefault)
                     </table>
                 </section>
             </div>
-            <div class="6u 16u$(medium) 12u$(xsmall)">
+            <div class="6u 12u$(medium)">
                 <section class="box">
                     <h3>Garden Beds</h3>
-                    <table>
+                    <table class="sprinkler-table">
 <?php
                         for ($i = 5; $i < count($config["gpio"]); $i++)
                         {
                             $bcn = $config["gpio"][$i]["broadcom_number"];
                             echo '<tr>',
-                                '<td style="vertical-align:middle; text-align: left;">' . $config["gpio"][$i]["name"] . ':</td>',
-                                '<td style="vertical-align:middle; width: 80px"><label class="switch"><input type="checkbox" id="switch_' . $i . '" onclick="toggleSwitch(' . $i . ',' . $bcn . ')">',
+                                '<td style="text-align:left; white-space:nowrap">' . $config["gpio"][$i]["name"] . ':</td>',
+                                '<td style="min-width:80px; width:80px"><label class="switch"><input type="checkbox" id="switch_' . $i . '" onclick="toggleSwitch(' . $i . ',' . $bcn . ')">',
                                 '<span class="slider round"></span>',
                                 '</label></td>',
                                 renderTimerControls($i, $bcn, $timerDefault),

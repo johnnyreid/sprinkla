@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 
 require __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../src/helpers/log.php';
 
 
 // Tell PHP that we're using UTF-8 strings until the end of the script

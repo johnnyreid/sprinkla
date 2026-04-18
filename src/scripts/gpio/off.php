@@ -19,19 +19,13 @@ if (!in_array($pin, $validPins, true)) {
 }
 
 $client = new Client(new Socket($config["pigpio_host"], $config["pigpio_port"]));
-$status = $client->sendRaw(new DefaultRequest(Commands::READ, $pin, 0))->getResponse();
-
-$newState = $status == 1 ? 0 : 1;
-
-$client->sendRaw(new DefaultRequest(Commands::WRITE, $pin, $newState));
+$client->sendRaw(new DefaultRequest(Commands::WRITE, $pin, 1));
 
 $gpioNames = array_column($config["gpio"], "name", "broadcom_number");
 $name = $gpioNames[$pin] ?? 'Unknown';
-$clientIp = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-$action = $newState === 0 ? 'ON' : 'OFF';
-sprinkla_log_operation("Toggled $name (pin $pin): → $action (from $clientIp)");
+sprinkla_log_operation("Auto-off $name (pin $pin)");
 
-// Record sprinkler on/off time for safety timeout
+// Clear sprinkler on-since record
 $dataDir = $config['data_dir'];
 if (!is_dir($dataDir)) {
     mkdir($dataDir, 0755, true);
@@ -39,17 +33,7 @@ if (!is_dir($dataDir)) {
 
 $onSinceFile = $dataDir . '/sprinkler_on_since.json';
 $onSince = file_exists($onSinceFile) ? (json_decode(file_get_contents($onSinceFile), true) ?: []) : [];
-
-if ($newState === 0) {
-    $onSince[(string) $pin] = [
-        'broadcomNumber' => $pin,
-        'name' => $name,
-        'startTime' => time(),
-    ];
-} else {
-    unset($onSince[(string) $pin]);
-}
-
+unset($onSince[(string) $pin]);
 file_put_contents($onSinceFile, json_encode($onSince, JSON_PRETTY_PRINT), LOCK_EX);
 
-echo (strval($newState));
+echo "1";
