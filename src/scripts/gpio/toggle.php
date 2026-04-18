@@ -21,8 +21,8 @@ if (!in_array($pin, $validPins, true)) {
 $client = new Client(new Socket($config["pigpio_host"], $config["pigpio_port"]));
 $status = $client->sendRaw(new DefaultRequest(Commands::READ, $pin, 0))->getResponse();
 
-$status = $status == 1 ? 0 : 1;
+$newState = $status == 1 ? 0 : 1;
 
-$status = $client->sendRaw(new DefaultRequest(Commands::WRITE, $pin, $status))->getResponse();
+$client->sendRaw(new DefaultRequest(Commands::WRITE, $pin, $newState));
 
-echo (strval($status));
+echo (strval($newState));
