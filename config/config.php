@@ -5,8 +5,9 @@ $config                                                             = [];
 $config["pigpio_host"]                                              = '192.168.20.9';
 $config["pigpio_port"]                                              = 8888;
 
-$config["timer_options"]                                            = [15, 20, 25];
-$config["timer_default"]                                            = 20;
+$config["timer_default"]                                            = 15;
+$config["timer_step"]                                               = 5;
+$config["timer_min"]                                                = 5;
 
 //Original configuration: array(17,18,27,22,23,24,25,4,5,6);
 //**************** Lawns ******************

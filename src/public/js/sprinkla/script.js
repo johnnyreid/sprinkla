@@ -67,20 +67,56 @@ function setSwitch(switchNumber, broadcomNumber) {
 // Timer management
 // ──────────────────────────────────────────────
 
+// Per-switch duration settings (in minutes), initialised to the default
+const durations = {};
+
 /**
- * Get the selected timer duration (in seconds) for a switch.
+ * Get the config element for reading data attributes.
+ */
+function getConfig() {
+    return document.getElementById("sprinkla-config");
+}
+
+/**
+ * Get the current timer duration (in seconds) for a switch.
  */
 function getSelectedDuration(switchNumber) {
-    const radios = document.querySelectorAll('input[name="timer_duration_' + switchNumber + '"]');
-    for (let i = 0; i < radios.length; i++) {
-        if (radios[i].checked) {
-            return parseInt(radios[i].value, 10) * 60;
-        }
+    const cfg = getConfig();
+    const defaultMin = cfg ? parseInt(cfg.dataset.timerDefault, 10) : 15;
+    if (durations[switchNumber] === undefined) {
+        durations[switchNumber] = defaultMin;
     }
-    // Fallback to global default (set in sprinkla.php as data attribute)
-    const container = document.getElementById("sprinkla-config");
-    const defaultMin = container ? parseInt(container.dataset.timerDefault, 10) : 20;
-    return defaultMin * 60;
+    return durations[switchNumber] * 60;
+}
+
+/**
+ * Adjust the duration for a switch by +/- one step (5 min).
+ */
+function adjustDuration(switchNumber, broadcomNumber, direction) {
+    const cfg = getConfig();
+    const step = cfg ? parseInt(cfg.dataset.timerStep, 10) : 5;
+    const min = cfg ? parseInt(cfg.dataset.timerMin, 10) : 5;
+    const defaultMin = cfg ? parseInt(cfg.dataset.timerDefault, 10) : 15;
+
+    if (durations[switchNumber] === undefined) {
+        durations[switchNumber] = defaultMin;
+    }
+
+    durations[switchNumber] += direction * step;
+    if (durations[switchNumber] < min) {
+        durations[switchNumber] = min;
+    }
+
+    // Update the display
+    const display = document.getElementById("timer_duration_display_" + switchNumber);
+    if (display) {
+        display.textContent = durations[switchNumber] + "m";
+    }
+
+    // If a timer is actively running, restart it with the new duration
+    if (timers[switchNumber] && !timers[switchNumber].paused) {
+        startTimerIfEnabled(switchNumber, broadcomNumber);
+    }
 }
 
 /**
@@ -215,15 +251,5 @@ function onTimerToggleChange(switchNumber, broadcomNumber) {
         } else {
             clearTimer(switchNumber);
         }
-    }
-}
-
-/**
- * Called when the duration radio is changed while a timer is running.
- */
-function onDurationChange(switchNumber, broadcomNumber) {
-    if (timers[switchNumber]) {
-        // Restart the timer with the new duration
-        startTimerIfEnabled(switchNumber, broadcomNumber);
     }
 }

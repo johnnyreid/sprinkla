@@ -31,13 +31,14 @@
 require_once __DIR__ . '/../../config/config.php';
 /** @var array $config */
 
-$timerOptions = $config["timer_options"];
 $timerDefault = $config["timer_default"];
+$timerStep = $config["timer_step"];
+$timerMin = $config["timer_min"];
 
 /**
- * Render timer controls (toggle, radio buttons, countdown) for a sprinkler row.
+ * Render timer controls (toggle, +/- duration, countdown) for a sprinkler row.
  */
-function renderTimerControls(int $index, int $broadcomNumber, array $timerOptions, int $timerDefault): string
+function renderTimerControls(int $index, int $broadcomNumber, int $timerDefault): string
 {
     $html = '';
 
@@ -48,15 +49,11 @@ function renderTimerControls(int $index, int $broadcomNumber, array $timerOption
     $html .= 'onchange="onTimerToggleChange(' . $index . ',' . $broadcomNumber . ')">';
     $html .= ' ⏱</label></td>';
 
-    // Duration radio buttons
-    $html .= '<td style="vertical-align:middle; white-space:nowrap">';
-    foreach ($timerOptions as $minutes) {
-        $checked = ($minutes === $timerDefault) ? ' checked' : '';
-        $html .= '<label class="timer-radio-label">';
-        $html .= '<input type="radio" name="timer_duration_' . $index . '" value="' . $minutes . '"' . $checked;
-        $html .= ' onchange="onDurationChange(' . $index . ',' . $broadcomNumber . ')">';
-        $html .= ' ' . $minutes . 'm</label> ';
-    }
+    // Duration adjuster: -5 / display / +5
+    $html .= '<td style="vertical-align:middle; white-space:nowrap; text-align:center">';
+    $html .= '<button class="timer-adj-btn" onclick="adjustDuration(' . $index . ',' . $broadcomNumber . ',-1)">−5</button> ';
+    $html .= '<span id="timer_duration_display_' . $index . '" class="timer-duration-display">' . $timerDefault . 'm</span> ';
+    $html .= '<button class="timer-adj-btn" onclick="adjustDuration(' . $index . ',' . $broadcomNumber . ',1)">+5</button>';
     $html .= '</td>';
 
     // Countdown display and clear button
@@ -91,7 +88,24 @@ function renderTimerControls(int $index, int $broadcomNumber, array $timerOption
     </noscript>
     <style>
         .timer-toggle-label { cursor: pointer; font-size: 1.1em; }
-        .timer-radio-label { font-size: 0.85em; margin-right: 4px; cursor: pointer; }
+        .timer-adj-btn {
+            background: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.85em;
+            padding: 2px 8px;
+            font-weight: bold;
+        }
+        .timer-adj-btn:hover { background: #e0e0e0; }
+        .timer-duration-display {
+            font-family: monospace;
+            font-size: 0.95em;
+            font-weight: bold;
+            min-width: 30px;
+            display: inline-block;
+            text-align: center;
+        }
         .timer-countdown {
             font-family: monospace;
             font-size: 1em;
@@ -123,7 +137,7 @@ function renderTimerControls(int $index, int $broadcomNumber, array $timerOption
 </head>
 <body class="landing">
 
-<div id="sprinkla-config" data-timer-default="<?php echo $timerDefault; ?>" style="display:none"></div>
+<div id="sprinkla-config" data-timer-default="<?php echo $timerDefault; ?>" data-timer-step="<?php echo $timerStep; ?>" data-timer-min="<?php echo $timerMin; ?>" style="display:none"></div>
 
 <?php include "header.html" ?>
 
@@ -153,7 +167,7 @@ function renderTimerControls(int $index, int $broadcomNumber, array $timerOption
                             '<td style="vertical-align:middle; width: 80px"><label class="switch"><input type="checkbox" id="switch_' . $i . '" onclick="toggleSwitch(' . $i . ',' . $bcn . ')">',
                             '<span class="slider round"></span>',
                             '</label></td>',
-                            renderTimerControls($i, $bcn, $timerOptions, $timerDefault),
+                            renderTimerControls($i, $bcn, $timerDefault),
                             '</tr>',
                             '<script type="text/javascript">',
                             'setSwitch(' . $i . ',' . $bcn . ');',
@@ -176,7 +190,7 @@ function renderTimerControls(int $index, int $broadcomNumber, array $timerOption
                                 '<td style="vertical-align:middle; width: 80px"><label class="switch"><input type="checkbox" id="switch_' . $i . '" onclick="toggleSwitch(' . $i . ',' . $bcn . ')">',
                                 '<span class="slider round"></span>',
                                 '</label></td>',
-                                renderTimerControls($i, $bcn, $timerOptions, $timerDefault),
+                                renderTimerControls($i, $bcn, $timerDefault),
                                 '</tr>',
                                 '<script type="text/javascript">',
                                 'setSwitch(' . $i . ',' . $bcn . ');',
