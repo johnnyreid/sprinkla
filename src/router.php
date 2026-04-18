@@ -38,7 +38,7 @@ function route($route, $path_to_include)
 {
     $callback = $path_to_include;
     if (!is_callable($callback)) {
-        if (!strpos($path_to_include, '.php')) {
+        if (!str_contains($path_to_include, '.php')) {
             $path_to_include .= '.php';
         }
     }
@@ -104,7 +104,7 @@ function is_csrf_valid()
     if (!isset($_SESSION['csrf']) || !isset($_POST['csrf'])) {
         return false;
     }
-    if ($_SESSION['csrf'] != $_POST['csrf']) {
+    if (!hash_equals($_SESSION['csrf'], $_POST['csrf'])) {
         return false;
     }
     return true;

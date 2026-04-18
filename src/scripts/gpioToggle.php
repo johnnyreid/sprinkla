@@ -1,61 +1,34 @@
-<?php
+<?php declare(strict_types=1);
+
+require_once __DIR__ . '/../config/config.php';
 
 use Volantus\Pigpio\Client;
 use Volantus\Pigpio\Network\Socket;
 use Volantus\Pigpio\Protocol\Commands;
 use Volantus\Pigpio\Protocol\DefaultRequest;
 
-function ToggleGpio(int $gpioNumber)
+function ToggleGpio(int $gpioNumber): int
 {
-    $client = new Client(new Socket('192.168.20.9', 8888));
+    global $config;
 
-    //set the gpio's mode to output
-//    system("sudo gpio mode " . $gpioNumber . " out");
-    //reading pin's status
-//    exec("sudo gpio read " . $gpioNumber, $status, $return);
-    //read the current value of the pin and load into the array
+    $client = new Client(new Socket($config["pigpio_host"], $config["pigpio_port"]));
     $status = $client->sendRaw(new DefaultRequest(Commands::READ, $gpioNumber, 0))->getResponse();
 
-    //set the gpio to high/low
-    if ($status == "0")
-    {
-        $status = "1";
-    }
-    elseif( $status == "1" )
-    {
-        $status = "0";
-    }
-    $status = $client->sendRaw(new DefaultRequest(Commands::WRITE, $gpioNumber, $status))->getResponse();
+    $status = $status == 1 ? 0 : 1;
 
-//    system("sudo gpio write " . $gpioNumber . " " . $status[0]);
-    //reading pin's status
-//    exec("sudo gpio read " . $gpioNumber, $status, $return);
-    //return the status of the GPIO
-    return ($status);
+    return $client->sendRaw(new DefaultRequest(Commands::WRITE, $gpioNumber, $status))->getResponse();
 }
 
 if (PHP_SAPI === 'cli')
 {
-
     echo "Welcome to gpioToggle!\n";
     echo "CLI detected...\n";
 
-    $gpioNumber = intval($argv[1]) ??0?: 200;
+    $gpioNumber = isset($argv[1]) ? intval($argv[1]) : 0;
 
-    $b = 'blah';
-    $a = intval($b) ??0?: 200;
-    echo $a;
-
-    $b = 'blah';
-    $a = intval($b) ??0;
-    echo $a;
-
-
-    if (  $gpioNumber === 200 ) {
+    if ($gpioNumber === 0) {
         echo "Invalid parameters were passed to the script, please try again.\n";
-    }
-    else
-    {
+    } else {
         echo "We will attempt to toggle GPIO number: $gpioNumber\n";
         $result = ToggleGpio($gpioNumber);
         echo $result . "\n";
@@ -63,45 +36,14 @@ if (PHP_SAPI === 'cli')
 }
 else
 {
-    //Getting and using values
-    if (isset ($_GET["switch"]))
+    if (isset($_GET["switch"]) && is_numeric($_GET["switch"]))
     {
-        $gpioNumber = strip_tags($_GET["switch"]);
-
-        //test if value is a number
-        if (is_numeric($gpioNumber))
-        {
-            $result = ToggleGpio($gpioNumber);
-
-            //Return the status of the gpio
-            echo $result;
-
-        }
-        else
-        {
-            echo("fail");
-        }
-    } //print fail if cannot use values
+        $gpioNumber = intval($_GET["switch"]);
+        $result = ToggleGpio($gpioNumber);
+        echo $result;
+    }
     else
     {
-        echo("fail");
+        echo "fail";
     }
-}
-
-
-function pleaseTurnOffInAFewMinutes(int $gpioNumber)
-{
-
-    system("sudo gpio write " . $gpioNumber . " 1");
-
-    //wait a sec
-    sleep(30);
-
-    system("sudo gpio write " . $gpioNumber . " 0");
-
-    //reading pin's status
-    exec("sudo gpio read " . $gpioNumber, $status, $return);
-
-    //return the status of the GPIO
-    return ($status[0]);
 }

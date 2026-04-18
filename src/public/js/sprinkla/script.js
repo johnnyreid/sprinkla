@@ -1,182 +1,174 @@
-let switch_0 = document.getElementById("switch_0");
-let switch_1 = document.getElementById("switch_1");
-let switch_2 = document.getElementById("switch_2");
-let switch_3 = document.getElementById("switch_3");
-let switch_4 = document.getElementById("switch_4");
-let switch_5 = document.getElementById("switch_5");
-let switch_6 = document.getElementById("switch_6");
-let switch_7 = document.getElementById("switch_7");
-let switch_8 = document.getElementById("switch_8");
-let switch_9 = document.getElementById("switch_9");
+// Timer state: tracks active countdown intervals and remaining seconds per switch
+const timers = {};
 
-//Create an array for easy access later
-let switches = [ switch_0, switch_1, switch_2, switch_3, switch_4, switch_5, switch_6, switch_7, switch_8, switch_9];
+/**
+ * Send a GET request and handle the response.
+ * @param {string} url
+ * @param {function(string): void} onSuccess - called with response text on 200
+ * @param {function(string): void} [onError] - called with error message
+ */
+function sendRequest(url, onSuccess, onError) {
+    const request = new XMLHttpRequest();
+    request.open("GET", url, true);
+    request.send(null);
 
-window.onload=function(){
-    const button = document.getElementById('button');
-    if (button) {
-        alert('Got the button element!');
-        button.addEventListener('click', onButtonClick);
+    request.onreadystatechange = function () {
+        if (request.readyState !== 4) return;
+
+        if (request.status === 200) {
+            onSuccess(request.responseText);
+        } else {
+            const msg = "Request to " + url + " failed (HTTP " + request.status + ")";
+            if (onError) {
+                onError(msg);
+            } else {
+                alert(msg);
+            }
+        }
+    };
+}
+
+/**
+ * Toggle a sprinkler on/off and manage the auto-off timer.
+ */
+function toggleSwitch(switchNumber, broadcomNumber) {
+    sendRequest("/gpio/toggle/" + broadcomNumber, function (data) {
+        if (data === "1") {
+            // Sprinkler turned OFF — clear any active timer
+            clearTimer(switchNumber);
+        } else if (data === "0") {
+            // Sprinkler turned ON — start timer if enabled
+            startTimerIfEnabled(switchNumber, broadcomNumber);
+        } else if (data === "fail") {
+            alert("Toggle failed: the server returned an error.");
+        } else {
+            alert("Toggle failed: unexpected response from server.");
+        }
+    });
+}
+
+/**
+ * Read the current state of a sprinkler and set the checkbox accordingly.
+ */
+function setSwitch(switchNumber, broadcomNumber) {
+    sendRequest("/gpio/read/" + broadcomNumber, function (data) {
+        const elem = document.getElementById("switch_" + switchNumber);
+        if (data === "0") {
+            elem.checked = true;
+        } else if (data === "1") {
+            elem.checked = false;
+        } else {
+            alert("Failed to read sprinkler state.");
+        }
+    });
+}
+
+// ──────────────────────────────────────────────
+// Timer management
+// ──────────────────────────────────────────────
+
+/**
+ * Get the selected timer duration (in seconds) for a switch.
+ */
+function getSelectedDuration(switchNumber) {
+    const radios = document.querySelectorAll('input[name="timer_duration_' + switchNumber + '"]');
+    for (let i = 0; i < radios.length; i++) {
+        if (radios[i].checked) {
+            return parseInt(radios[i].value, 10) * 60;
+        }
+    }
+    // Fallback to global default (set in sprinkla.php as data attribute)
+    const container = document.getElementById("sprinkla-config");
+    const defaultMin = container ? parseInt(container.dataset.timerDefault, 10) : 20;
+    return defaultMin * 60;
+}
+
+/**
+ * Check if the timer toggle is enabled for a switch.
+ */
+function isTimerEnabled(switchNumber) {
+    const toggle = document.getElementById("timer_toggle_" + switchNumber);
+    return toggle && toggle.checked;
+}
+
+/**
+ * Start the auto-off countdown if the timer toggle is enabled.
+ */
+function startTimerIfEnabled(switchNumber, broadcomNumber) {
+    if (!isTimerEnabled(switchNumber)) return;
+
+    // Clear any existing timer first
+    clearTimer(switchNumber);
+
+    let remaining = getSelectedDuration(switchNumber);
+    updateTimerDisplay(switchNumber, remaining);
+
+    timers[switchNumber] = {
+        broadcomNumber: broadcomNumber,
+        remaining: remaining,
+        intervalId: setInterval(function () {
+            remaining--;
+            timers[switchNumber].remaining = remaining;
+            updateTimerDisplay(switchNumber, remaining);
+
+            if (remaining <= 0) {
+                // Auto-off: toggle the sprinkler
+                toggleSwitch(switchNumber, broadcomNumber);
+                // Note: clearTimer will be called by toggleSwitch when it gets the "1" response
+            }
+        }, 1000)
+    };
+}
+
+/**
+ * Clear the countdown timer for a switch.
+ */
+function clearTimer(switchNumber) {
+    if (timers[switchNumber]) {
+        clearInterval(timers[switchNumber].intervalId);
+        delete timers[switchNumber];
+    }
+    updateTimerDisplay(switchNumber, 0);
+}
+
+/**
+ * Update the visible countdown display.
+ */
+function updateTimerDisplay(switchNumber, totalSeconds) {
+    const display = document.getElementById("timer_display_" + switchNumber);
+    if (!display) return;
+
+    if (totalSeconds <= 0) {
+        display.textContent = "";
+        display.style.display = "none";
+    } else {
+        const mins = Math.floor(totalSeconds / 60);
+        const secs = totalSeconds % 60;
+        display.textContent = mins.toString().padStart(2, "0") + ":" + secs.toString().padStart(2, "0");
+        display.style.display = "inline";
     }
 }
 
-
-function onButtonClick() {
-    alert('Button clicked!');
-}
-function removeCheck ( switchNumber )
-{
-    const elem = document.getElementById("switch_" + switchNumber);
-    elem.removeAttribute("checked" )
-}
-
-//This function is asking for gpio.php, receiving datas and updating the index.php pictures
-function toggleSwitch( switchNumber, broadcomNumber )
-{
-    let data = "";
-
-    //this is the http request
-    let request = new XMLHttpRequest();
-    request.open( "GET" , "/gpio/toggle/" + broadcomNumber, true);
-    request.send(null);
-
-    //receiving informations
-    request.onreadystatechange = function () {
-        if (request.readyState === 4 && request.status === 200) {
-            data = request.responseText;
-
-            //update the index pic
-            if ( data === "1" ) //switch is off
-            {
-                //todo: remove the line below
-                // alert("Switch " + switchNumber + " has been toggled and is off. Data: " + data);
-                // switches[switchNumber].removeAttribute("checked");
-            }
-            else if ( data === "0" ) //switch is on
-            {
-                //todo: remove the line below
-                // alert("Switch " + switchNumber + "  has been toggled and is on. Data: " + data);
-                //
-                // switches[switchNumber].setAttribute("checked", "checked");
-
-                // //this is the http request
-                // var request2 = new XMLHttpRequest();
-                // request2.open( "GET" , "../app/scripts/pleaseTurnOffInAFewMinutes.php?switch=" + gpioNumber, true);
-                // request2.send(null);
-            }
-            else if ((data.localeCompare("fail")))
-            {
-                alert("Something went wrong1!");
-                return ("fail");
-            }
-            else
-            {
-                alert("Something went wrong2!");
-                return ("fail");
-            }
+/**
+ * Called when a timer toggle is changed while a sprinkler is already on.
+ */
+function onTimerToggleChange(switchNumber, broadcomNumber) {
+    const switchElem = document.getElementById("switch_" + switchNumber);
+    if (switchElem && switchElem.checked) {
+        if (isTimerEnabled(switchNumber)) {
+            startTimerIfEnabled(switchNumber, broadcomNumber);
+        } else {
+            clearTimer(switchNumber);
         }
-        else if (request.status === 404)
-        {
-            alert("Request Response 404: doesn't exist.");
-            return ("fail");
-        }
-        //test if fail
-        else if (request.readyState === 4 && request.status === 500)
-        {
-            alert("Request Response 500: Internal server error");
-            return ("fail");
-        }
-        //else
-        else if (request.readyState === 4 && request.status !== 200 && request.status !== 500)
-        {
-            alert(request.status)
-            alert("Something went wrong3!");
-
-            return ("fail");
-        }
-    };
-
-    return 0;
+    }
 }
 
-function setSwitch( switchNumber, broadcomNumber )
-{
-    let data = "empty";
-
-    //this is the http request
-    let request = new XMLHttpRequest();
-    request.open( "GET" , "/gpio/read/" + broadcomNumber, true);
-    request.send(null);
-
-    //receiving informations
-    request.onreadystatechange = function () {
-        if (request.readyState === 4 && request.status === 200)
-        {
-            data = request.responseText;
-
-            //update the index pic
-            if ( data === "0" ) //switch is on
-            {
-                //todo: remove the line below
-                const elem = document.getElementById("switch_" + switchNumber);
-                elem.setAttribute("checked", "checked")
-
-                // alert("Switch " + switchNumber + " is on. Data: " + data.toString());
-                // switches[switchNumber].setAttribute("checked", "checked");
-            }
-            else if ( data === "1" ) //switch is off
-            {
-                //todo: remove the line below
-                // alert("Switch " + switchNumber + " is off. Data: " + data.toString());
-                const elem = document.getElementById("switch_" + switchNumber);
-                elem.removeAttribute("checked");
-                // switches[switchNumber].removeAttribute("checked");
-            }
-            else
-            {
-                alert("Something went wrong2!");
-                return ("fail");
-            }
-        }
-        else if (request.status === 404)
-        {
-            alert("Request Response 404: doesn't exist.");
-            return ("fail");
-        }
-        //test if fail
-        else if (request.readyState === 4 && request.status === 500)
-        {
-            alert("Request Response 500: Internal server error");
-            return ("fail");
-        }
-        //else
-        else if (request.readyState === 4 && request.status !== 200 && request.status !== 500)
-        {
-            alert(request.status)
-            alert("Something went wrong3!");
-
-            return ("fail");
-        }
-    };
-
-    return 0;
+/**
+ * Called when the duration radio is changed while a timer is running.
+ */
+function onDurationChange(switchNumber, broadcomNumber) {
+    if (timers[switchNumber]) {
+        // Restart the timer with the new duration
+        startTimerIfEnabled(switchNumber, broadcomNumber);
+    }
 }
-
-// function blah()
-// {
-//     //this is the http request
-//     var request = new XMLHttpRequest();
-//     request.open( "GET" , "../../app/scripts/gpioToggle.php?switch=2", true);
-//
-//     //receiving informations
-//     request.onreadystatechange = function (){
-//         if ( request.readyState === 4 ){
-//             document.getElementById("demo").innerHTML = request.responseText;
-//
-//         }else{
-//             document.getElementById("demo").innerHTML = request.statusText;
-//             alert(request.statusText);
-//         }
-//     };
-//     request.send(null);
-// }

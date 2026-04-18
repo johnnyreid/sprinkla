@@ -16,12 +16,6 @@
 //
 //# Not in use:
 //# 10    | 22    | 31  | 6
-//# 11    | 23    | 33  | 13
-//# 12    | 24    | 35  | 19
-//# 13    | 25    | 37  | 26
-//# 14    | 26    | 32  | 12
-//# 15    | 27    | 36  | 16
-//# 16    | 28    | 38  | 20
 //
 //# ##### NOTE: ##########
 //# 0 = relay on
@@ -31,9 +25,41 @@
 require_once __DIR__ . '/../../config/config.php';
 /** @var array $config */
 
+$timerOptions = $config["timer_options"];
+$timerDefault = $config["timer_default"];
 
+/**
+ * Render timer controls (toggle, radio buttons, countdown) for a sprinkler row.
+ */
+function renderTimerControls(int $index, int $broadcomNumber, array $timerOptions, int $timerDefault): string
+{
+    $html = '';
 
-//$gpioPins               = array(17,18,27,22,23,24,25,4,5,6);
+    // Timer enable toggle
+    $html .= '<td style="vertical-align:middle; text-align:center; width:50px">';
+    $html .= '<label class="timer-toggle-label" title="Enable auto-off timer">';
+    $html .= '<input type="checkbox" id="timer_toggle_' . $index . '" ';
+    $html .= 'onchange="onTimerToggleChange(' . $index . ',' . $broadcomNumber . ')">';
+    $html .= ' ⏱</label></td>';
+
+    // Duration radio buttons
+    $html .= '<td style="vertical-align:middle; white-space:nowrap">';
+    foreach ($timerOptions as $minutes) {
+        $checked = ($minutes === $timerDefault) ? ' checked' : '';
+        $html .= '<label class="timer-radio-label">';
+        $html .= '<input type="radio" name="timer_duration_' . $index . '" value="' . $minutes . '"' . $checked;
+        $html .= ' onchange="onDurationChange(' . $index . ',' . $broadcomNumber . ')">';
+        $html .= ' ' . $minutes . 'm</label> ';
+    }
+    $html .= '</td>';
+
+    // Countdown display
+    $html .= '<td style="vertical-align:middle; width:60px; text-align:center">';
+    $html .= '<span id="timer_display_' . $index . '" class="timer-countdown" style="display:none"></span>';
+    $html .= '</td>';
+
+    return $html;
+}
 ?>
 
 <!DOCTYPE html>
@@ -42,23 +68,39 @@ require_once __DIR__ . '/../../config/config.php';
     <meta charset="UTF-8">
     <title>Sprinkla</title>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <meta name="description" content="" />
-    <meta name="keywords" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Sprinkla sprinkler control interface" />
     <!--[if lte IE 8]><script src="js/html5shiv.js"></script><![endif]-->
     <script src="js/jquery.min.js"></script>
     <script src="js/skel.min.js"></script>
     <script src="js/skel-layers.min.js"></script>
     <script src="js/init.js"></script>
-    <!-- javascript -->
     <script src="js/sprinkla/script.js"></script>
     <noscript>
         <link rel="stylesheet" href="css/skel.css" />
         <link rel="stylesheet" href="css/style.css" />
         <link rel="stylesheet" href="css/style-xlarge.css" />
     </noscript>
+    <style>
+        .timer-toggle-label { cursor: pointer; font-size: 1.1em; }
+        .timer-radio-label { font-size: 0.85em; margin-right: 4px; cursor: pointer; }
+        .timer-countdown {
+            font-family: monospace;
+            font-size: 1em;
+            font-weight: bold;
+            color: #e74c3c;
+            background: #fef0ef;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 <body class="landing">
+
+<div id="sprinkla-config" data-timer-default="<?php echo $timerDefault; ?>" style="display:none"></div>
+
 <?php include "header.html" ?>
+
 <!-- Banner -->
 <section id="banner">
     <header class="major">
@@ -77,19 +119,19 @@ require_once __DIR__ . '/../../config/config.php';
                     <h3>Lawn Sprinklers</h3>
                     <table>
 <?php
-                    for ( $i= 0; $i<5; $i++)
+                    for ($i = 0; $i < 5; $i++)
                     {
-                        echo    '<tr>',
-                                '<td style="vertical-align: middle; text-align: left">'.$config["gpio"][$i]["name"].':</td>',
-                                '<td style="vertical-align:middle; width: 80px"><label class="switch"><input type="checkbox" id="switch_'.$i.'" onclick="toggleSwitch('.$i.','.$config["gpio"][$i]["broadcom_number"].')">',
-                                '<span class="slider round"></span>',
-                                '</label></td>',
-                                '</tr>',
-                                #run a script to set the initial checked status
-                                '<script type="text/javascript">',
-                                'setSwitch('.$i.','.$config["gpio"][$i]["broadcom_number"].');',
-                                '</script>'
-                                ;
+                        $bcn = $config["gpio"][$i]["broadcom_number"];
+                        echo '<tr>',
+                            '<td style="vertical-align: middle; text-align: left">' . $config["gpio"][$i]["name"] . ':</td>',
+                            '<td style="vertical-align:middle; width: 80px"><label class="switch"><input type="checkbox" id="switch_' . $i . '" onclick="toggleSwitch(' . $i . ',' . $bcn . ')">',
+                            '<span class="slider round"></span>',
+                            '</label></td>',
+                            renderTimerControls($i, $bcn, $timerOptions, $timerDefault),
+                            '</tr>',
+                            '<script type="text/javascript">',
+                            'setSwitch(' . $i . ',' . $bcn . ');',
+                            '</script>';
                     }
 ?>
                     </table>
@@ -99,23 +141,22 @@ require_once __DIR__ . '/../../config/config.php';
                 <section class="box">
                     <h3>Garden Beds</h3>
                     <table>
-
-                        <?php
-                        for ( $i=5; $i<count($config["gpio"]); $i++)
+<?php
+                        for ($i = 5; $i < count($config["gpio"]); $i++)
                         {
-                            echo    '<tr>',
-                                '<td style="vertical-align:middle; text-align: left;">'.$config["gpio"][$i]["name"].':</td>',
-                                '<td style="vertical-align:middle; width: 80px"><label class="switch"><input type="checkbox" id="switch_' . $i . '" onclick="toggleSwitch('.$i.','.$config["gpio"][$i]["broadcom_number"].')">',
-                            '<span class="slider round"></span>',
-                            '</label></td>',
-                            '</tr>',
-                                #run a script to set the initial checked status
-                            '<script type="text/javascript">',
-                                '   setSwitch('.$i.','.$config["gpio"][$i]["broadcom_number"].');',
-                            '</script>'
-                            ;
+                            $bcn = $config["gpio"][$i]["broadcom_number"];
+                            echo '<tr>',
+                                '<td style="vertical-align:middle; text-align: left;">' . $config["gpio"][$i]["name"] . ':</td>',
+                                '<td style="vertical-align:middle; width: 80px"><label class="switch"><input type="checkbox" id="switch_' . $i . '" onclick="toggleSwitch(' . $i . ',' . $bcn . ')">',
+                                '<span class="slider round"></span>',
+                                '</label></td>',
+                                renderTimerControls($i, $bcn, $timerOptions, $timerDefault),
+                                '</tr>',
+                                '<script type="text/javascript">',
+                                'setSwitch(' . $i . ',' . $bcn . ');',
+                                '</script>';
                         }
-                        ?>
+?>
                     </table>
                 </section>
             </div>
@@ -123,8 +164,7 @@ require_once __DIR__ . '/../../config/config.php';
     </div>
 </section>
 
-
-<?php include  "footer.html"?>
+<?php include "footer.html" ?>
 
 </body>
 </html>
