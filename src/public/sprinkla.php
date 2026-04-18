@@ -59,9 +59,11 @@ function renderTimerControls(int $index, int $broadcomNumber, array $timerOption
     }
     $html .= '</td>';
 
-    // Countdown display
-    $html .= '<td style="vertical-align:middle; width:60px; text-align:center">';
-    $html .= '<span id="timer_display_' . $index . '" class="timer-countdown" style="display:none"></span>';
+    // Countdown display and clear button
+    $html .= '<td style="vertical-align:middle; width:100px; text-align:center; white-space:nowrap">';
+    $html .= '<span id="timer_display_' . $index . '" class="timer-countdown" style="display:none"></span> ';
+    $html .= '<button id="timer_clear_' . $index . '" class="timer-clear-btn" style="display:none" ';
+    $html .= 'onclick="onTimerClear(' . $index . ')" title="Clear timer">✕</button>';
     $html .= '</td>';
 
     return $html;
@@ -98,6 +100,24 @@ function renderTimerControls(int $index, int $broadcomNumber, array $timerOption
             background: #fef0ef;
             padding: 2px 6px;
             border-radius: 4px;
+        }
+        .timer-paused {
+            color: #e67e22;
+            background: #fef5e7;
+        }
+        .timer-clear-btn {
+            background: none;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.8em;
+            padding: 1px 5px;
+            color: #999;
+            vertical-align: middle;
+        }
+        .timer-clear-btn:hover {
+            color: #e74c3c;
+            border-color: #e74c3c;
         }
     </style>
 </head>

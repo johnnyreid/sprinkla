@@ -34,11 +34,11 @@ function sendRequest(url, onSuccess, onError) {
 function toggleSwitch(switchNumber, broadcomNumber) {
     sendRequest("/gpio/toggle/" + broadcomNumber, function (data) {
         if (data === "1") {
-            // Sprinkler turned OFF — clear any active timer
-            clearTimer(switchNumber);
+            // Sprinkler turned OFF — pause the timer if running
+            pauseTimer(switchNumber);
         } else if (data === "0") {
-            // Sprinkler turned ON — start timer if enabled
-            startTimerIfEnabled(switchNumber, broadcomNumber);
+            // Sprinkler turned ON — resume paused timer or start new one if enabled
+            resumeOrStartTimer(switchNumber, broadcomNumber);
         } else if (data === "fail") {
             alert("Toggle failed: the server returned an error.");
         } else {
@@ -97,31 +97,66 @@ function isTimerEnabled(switchNumber) {
 function startTimerIfEnabled(switchNumber, broadcomNumber) {
     if (!isTimerEnabled(switchNumber)) return;
 
-    // Clear any existing timer first
     clearTimer(switchNumber);
 
     let remaining = getSelectedDuration(switchNumber);
+    startCountdown(switchNumber, broadcomNumber, remaining);
+}
+
+/**
+ * Resume a paused timer, or start a new one if none is paused.
+ */
+function resumeOrStartTimer(switchNumber, broadcomNumber) {
+    if (timers[switchNumber] && timers[switchNumber].paused) {
+        // Resume from where it left off
+        startCountdown(switchNumber, broadcomNumber, timers[switchNumber].remaining);
+    } else {
+        startTimerIfEnabled(switchNumber, broadcomNumber);
+    }
+}
+
+/**
+ * Start (or resume) the interval countdown from a given number of seconds.
+ */
+function startCountdown(switchNumber, broadcomNumber, remaining) {
+    // Clear any running interval but keep the timer entry
+    if (timers[switchNumber] && timers[switchNumber].intervalId) {
+        clearInterval(timers[switchNumber].intervalId);
+    }
+
     updateTimerDisplay(switchNumber, remaining);
+    updateClearButton(switchNumber, true);
 
     timers[switchNumber] = {
         broadcomNumber: broadcomNumber,
         remaining: remaining,
+        paused: false,
         intervalId: setInterval(function () {
             remaining--;
             timers[switchNumber].remaining = remaining;
             updateTimerDisplay(switchNumber, remaining);
 
             if (remaining <= 0) {
-                // Auto-off: toggle the sprinkler
                 toggleSwitch(switchNumber, broadcomNumber);
-                // Note: clearTimer will be called by toggleSwitch when it gets the "1" response
             }
         }, 1000)
     };
 }
 
 /**
- * Clear the countdown timer for a switch.
+ * Pause the countdown timer (stop ticking but keep remaining time).
+ */
+function pauseTimer(switchNumber) {
+    if (!timers[switchNumber]) return;
+
+    clearInterval(timers[switchNumber].intervalId);
+    timers[switchNumber].intervalId = null;
+    timers[switchNumber].paused = true;
+    updateTimerDisplay(switchNumber, timers[switchNumber].remaining);
+}
+
+/**
+ * Clear the countdown timer completely (reset to zero).
  */
 function clearTimer(switchNumber) {
     if (timers[switchNumber]) {
@@ -129,10 +164,11 @@ function clearTimer(switchNumber) {
         delete timers[switchNumber];
     }
     updateTimerDisplay(switchNumber, 0);
+    updateClearButton(switchNumber, false);
 }
 
 /**
- * Update the visible countdown display.
+ * Update the visible countdown display. Shows "PAUSED" styling when paused.
  */
 function updateTimerDisplay(switchNumber, totalSeconds) {
     const display = document.getElementById("timer_display_" + switchNumber);
@@ -144,9 +180,28 @@ function updateTimerDisplay(switchNumber, totalSeconds) {
     } else {
         const mins = Math.floor(totalSeconds / 60);
         const secs = totalSeconds % 60;
-        display.textContent = mins.toString().padStart(2, "0") + ":" + secs.toString().padStart(2, "0");
+        const timeStr = mins.toString().padStart(2, "0") + ":" + secs.toString().padStart(2, "0");
+        const isPaused = timers[switchNumber] && timers[switchNumber].paused;
+        display.textContent = isPaused ? timeStr + " ⏸" : timeStr;
         display.style.display = "inline";
+        display.className = isPaused ? "timer-countdown timer-paused" : "timer-countdown";
     }
+}
+
+/**
+ * Show or hide the clear button for a timer.
+ */
+function updateClearButton(switchNumber, visible) {
+    const btn = document.getElementById("timer_clear_" + switchNumber);
+    if (!btn) return;
+    btn.style.display = visible ? "inline" : "none";
+}
+
+/**
+ * Called when the clear button is clicked — fully resets the timer.
+ */
+function onTimerClear(switchNumber) {
+    clearTimer(switchNumber);
 }
 
 /**
